@@ -137,177 +137,255 @@ const createScene = () => {
       let pickedPointObjectCoordinates = {
         x: pickedPointObject.x,
         y: pickedPointObject.y,
-        z: pickedPointObject.z
-      }
+        z: pickedPointObject.z,
+      };
 
-      for(let key in pickedPointObjectCoordinates) {
-      
-        if(Math.abs(pickedPointObjectCoordinates[key]) === Math.max.apply(null, Object.values(pickedPointObjectCoordinates).map(coord => Math.abs(coord)))) {
-         return key
+      for (let key in pickedPointObjectCoordinates) {
+        if (
+          Math.abs(pickedPointObjectCoordinates[key]) ===
+          Math.max.apply(
+            null,
+            Object.values(pickedPointObjectCoordinates).map((coord) =>
+              Math.abs(coord)
+            )
+          )
+        ) {
+          return key;
         }
       }
-
     }
 
     findPickedCubieRelatives(pickedCubieItem, maxPickedPointCoordinateName) {
-      let cubieRelativesAndParentsToRotate = {}
+      let cubieRelativesAndParentsToRotate = {};
 
-      if(pickedCubieItem) {
-
+      if (pickedCubieItem) {
         let actionsWithCoordinates = {
-
           x: () => {
-            console.log('xxx');
-            cubieRelativesAndParentsToRotate.horizontalRelatives = this.cubies.filter(cubie => cubie.box.position.y === pickedCubieItem.position.y)
-            cubieRelativesAndParentsToRotate.horizontalParent = cubieRelativesAndParentsToRotate.horizontalRelatives.find(cubie => {
-              if(cubie.box.position.x === 0 && cubie.box.position.z === 0) return cubie
-            })
-            cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = 'y'
-            
-            cubieRelativesAndParentsToRotate.verticalRelatives = this.cubies.filter(cubie => cubie.box.position.z === pickedCubieItem.position.z)
-            cubieRelativesAndParentsToRotate.verticalParent = cubieRelativesAndParentsToRotate.verticalRelatives.find(cubie => {
-              if(cubie.box.position.x === 0 && cubie.box.position.y === 0) return cubie
-            })
-            cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = 'z'
-          },
-  
-          y: () => {
-            console.log('yyy');
-            cubieRelativesAndParentsToRotate.horizontalRelatives = this.cubies.filter(cubie => cubie.box.position.z === pickedCubieItem.position.z)
-            cubieRelativesAndParentsToRotate.horizontalParent = cubieRelativesAndParentsToRotate.horizontalRelatives.find(cubie => {
-              if(cubie.box.position.x === 0 && cubie.box.position.y === 0) return cubie
-            })
-            cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = 'z'
-      
-            cubieRelativesAndParentsToRotate.verticalRelatives = this.cubies.filter(cubie => cubie.box.position.x === pickedCubieItem.position.x)
-            cubieRelativesAndParentsToRotate.verticalParent = cubieRelativesAndParentsToRotate.verticalRelatives.find(cubie => {
-              if(cubie.box.position.z === 0 && cubie.box.position.y === 0) return cubie
-            })
-            cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = 'x'
-          },
-  
-          z: () => {
-            console.log('zzz');
-            cubieRelativesAndParentsToRotate.horizontalRelatives = this.cubies.filter(cubie => cubie.box.position.y === pickedCubieItem.position.y)
-        cubieRelativesAndParentsToRotate.horizontalParent = cubieRelativesAndParentsToRotate.horizontalRelatives.find(cubie => {
-          if(cubie.box.position.x === 0 && cubie.box.position.z === 0) return cubie
-        })
-        cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = 'y'
-  
-        cubieRelativesAndParentsToRotate.verticalRelatives = this.cubies.filter(cubie => cubie.box.position.x === pickedCubieItem.position.x)
-        cubieRelativesAndParentsToRotate.verticalParent = cubieRelativesAndParentsToRotate.verticalRelatives.find(cubie => {
-          if(cubie.box.position.z === 0 && cubie.box.position.y === 0) return cubie
-        })
-        cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = 'x'
-          }
-        }
+            console.log("xxx");
+            cubieRelativesAndParentsToRotate.horizontalRelatives =
+              this.cubies.filter(
+                (cubie) => cubie.box.position.y === pickedCubieItem.position.y
+              );
+            cubieRelativesAndParentsToRotate.horizontalParent =
+              cubieRelativesAndParentsToRotate.horizontalRelatives.find(
+                (cubie) => {
+                  if (cubie.box.position.x === 0 && cubie.box.position.z === 0)
+                    return cubie;
+                }
+              );
+            cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = "y";
 
-        actionsWithCoordinates[maxPickedPointCoordinateName]()
+            cubieRelativesAndParentsToRotate.verticalRelatives =
+              this.cubies.filter(
+                (cubie) => cubie.box.position.z === pickedCubieItem.position.z
+              );
+            cubieRelativesAndParentsToRotate.verticalParent =
+              cubieRelativesAndParentsToRotate.verticalRelatives.find(
+                (cubie) => {
+                  if (cubie.box.position.x === 0 && cubie.box.position.y === 0)
+                    return cubie;
+                }
+              );
+            cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = "z";
+          },
+
+          y: () => {
+            console.log("yyy");
+            cubieRelativesAndParentsToRotate.horizontalRelatives =
+              this.cubies.filter(
+                (cubie) => cubie.box.position.z === pickedCubieItem.position.z
+              );
+            cubieRelativesAndParentsToRotate.horizontalParent =
+              cubieRelativesAndParentsToRotate.horizontalRelatives.find(
+                (cubie) => {
+                  if (cubie.box.position.x === 0 && cubie.box.position.y === 0)
+                    return cubie;
+                }
+              );
+            cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = "z";
+
+            cubieRelativesAndParentsToRotate.verticalRelatives =
+              this.cubies.filter(
+                (cubie) => cubie.box.position.x === pickedCubieItem.position.x
+              );
+            cubieRelativesAndParentsToRotate.verticalParent =
+              cubieRelativesAndParentsToRotate.verticalRelatives.find(
+                (cubie) => {
+                  if (cubie.box.position.z === 0 && cubie.box.position.y === 0)
+                    return cubie;
+                }
+              );
+            cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = "x";
+          },
+
+          z: () => {
+            console.log("zzz");
+            cubieRelativesAndParentsToRotate.horizontalRelatives =
+              this.cubies.filter(
+                (cubie) => cubie.box.position.y === pickedCubieItem.position.y
+              );
+            cubieRelativesAndParentsToRotate.horizontalParent =
+              cubieRelativesAndParentsToRotate.horizontalRelatives.find(
+                (cubie) => {
+                  if (cubie.box.position.x === 0 && cubie.box.position.z === 0)
+                    return cubie;
+                }
+              );
+            cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = "y";
+
+            cubieRelativesAndParentsToRotate.verticalRelatives =
+              this.cubies.filter(
+                (cubie) => cubie.box.position.x === pickedCubieItem.position.x
+              );
+            cubieRelativesAndParentsToRotate.verticalParent =
+              cubieRelativesAndParentsToRotate.verticalRelatives.find(
+                (cubie) => {
+                  if (cubie.box.position.z === 0 && cubie.box.position.y === 0)
+                    return cubie;
+                }
+              );
+            cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = "x";
+          },
+        };
+
+        actionsWithCoordinates[maxPickedPointCoordinateName]();
       }
 
-      return cubieRelativesAndParentsToRotate
+      return cubieRelativesAndParentsToRotate;
     }
 
     moveSides() {
-      let horizontalMove = false
-      let verticalMove = false
-      let isSideChosen = false
+      let horizontalMove = false;
+      let verticalMove = false;
+      let isSideChosen = false;
 
-      let that = this
-      let horizontalRelatives
-      let verticalRelatives
-      let horizontalParent
-      let verticalParent
+      let that = this;
+      let horizontalRelatives;
+      let verticalRelatives;
+      let horizontalParent;
+      let verticalParent;
 
       scene.onPointerDown = function () {
-        
-        let pickResult = scene.pick(scene.pointerX, scene.pointerY)
-        let pickedCubie = pickResult.pickedMesh
-        let pickedPoint = pickResult.pickedPoint
-        
+        let pickResult = scene.pick(scene.pointerX, scene.pointerY);
+        let pickedCubie = pickResult.pickedMesh;
+        let pickedPoint = pickResult.pickedPoint;
 
-        if(pickResult.hit) {
-
+        if (pickResult.hit) {
           camera.inputs.attached.pointers.detachControl();
 
-          let relativesAndParents = that.findPickedCubieRelatives(pickedCubie, that.findMaxCoordinateOfPickedCubie(pickedPoint))
+          let relativesAndParents = that.findPickedCubieRelatives(
+            pickedCubie,
+            that.findMaxCoordinateOfPickedCubie(pickedPoint)
+          );
 
-          horizontalRelatives = relativesAndParents.horizontalRelatives
-          horizontalParent = relativesAndParents.horizontalParent
-          verticalRelatives = relativesAndParents.verticalRelatives
-          verticalParent = relativesAndParents.verticalParent
-         
-         
-          scene.onPointerMove = function(event) {
-            
-            if((Math.abs(event.movementX) > Math.abs(event.movementY)) && !verticalMove) {
-              if(!isSideChosen) {
-                horizontalRelatives.forEach(rel => {
-                  if(JSON.stringify(rel.box.position) !== JSON.stringify(horizontalParent.box.position)) {
-                    rel.box.parent = horizontalParent.box
-                    rel.box.position[relativesAndParents.horizontalPlaneToRotateIn] -= horizontalParent.box.position[relativesAndParents.horizontalPlaneToRotateIn]
-                   
-                  }
-                })
-                isSideChosen = true
-              }
-              horizontalMove = true
-             horizontalParent.box.rotation[relativesAndParents.horizontalPlaneToRotateIn] = -event.offsetX / 50
-         
-              
-            }
-           else if((Math.abs(event.movementX) < Math.abs(event.movementY)) && !horizontalMove) {
-             if(!isSideChosen) {
-              verticalRelatives.forEach(rel => {
-                if(JSON.stringify(rel.box.position) !== JSON.stringify(verticalParent.box.position)) {
-                  rel.box.parent = verticalParent.box
-                  rel.box.position[relativesAndParents.verticalPlaneToRotateIn] -= verticalParent.box.position[relativesAndParents.verticalPlaneToRotateIn]
-                }
-              })
-               isSideChosen = true
-             }
-            verticalMove = true
-           verticalParent.box.rotation[relativesAndParents.verticalPlaneToRotateIn] = -event.offsetY / 50
-            
-            }
-            pickedCubie.material.alpha = 1
-            
-           }
-  
-   
-           scene.onPointerUp = function() {
-             //pickedCubie.parent = null
-            pickedCubie.material.alpha = 0.5
-            camera.inputs.attachInput(camera.inputs.attached.pointers);
-             scene.onPointerMove = null
-             scene.onPointerUp = null
-              
-            isSideChosen = false
-            horizontalRelatives.forEach(relative => {
-              
-              const matrix = relative.box.computeWorldMatrix(true); //true forces a recalculation rather than using cache version
-              const local_position = new BABYLON.Vector3(0, 0, 0); //Required position of C in the local space of P
-              const global_position = BABYLON.Vector3.TransformCoordinates(local_position, matrix); //Obtain the required position of C in World Space
-              relative.box.parent = null
-              relative.box.position = global_position;
-              relative.box.rotation = horizontalParent.box.rotation
- 
-              
-            })
-            verticalRelatives.forEach(relative => {
-              relative.box.parent = null
-            })
-             horizontalMove = false
-             verticalMove = false
-           }
-        }
+          horizontalRelatives = relativesAndParents.horizontalRelatives;
+          horizontalParent = relativesAndParents.horizontalParent;
 
-        
-    };
+          verticalRelatives = relativesAndParents.verticalRelatives;
+          verticalParent = relativesAndParents.verticalParent;
+
+          scene.onPointerMove = function (event) {
+            if (
+             ( Math.abs(event.movementX) > Math.abs(event.movementY)) &&
+              !verticalMove
+            ) {
       
-    }
-  }
+              if (!isSideChosen) {
+                horizontalRelatives.forEach((rel) => {
+                  if (
+                    JSON.stringify(rel.box.position) !==
+                    JSON.stringify(horizontalParent.box.position)
+                  ) {
+                    rel.box.parent = horizontalParent.box;
+                    rel.box.position[
+                      relativesAndParents.horizontalPlaneToRotateIn
+                    ] -=
+                      horizontalParent.box.position[
+                      relativesAndParents.horizontalPlaneToRotateIn
+                      ];
+                  }
+                });
+                isSideChosen = true;
+              }
+              horizontalMove = true;
 
+              horizontalParent.box.rotation[
+                relativesAndParents.horizontalPlaneToRotateIn
+              ] = -event.offsetX / 50;
+
+            } else if (
+              (Math.abs(event.movementX) < Math.abs(event.movementY)) &&
+              !horizontalMove
+            ) {
+              if (!isSideChosen) {
+
+                verticalRelatives.forEach((rel) => {
+                  if (
+                    JSON.stringify(rel.box.position) !==
+                    JSON.stringify(verticalParent.box.position)
+                  ) {
+                   
+                    rel.box.parent = verticalParent.box;
+                    rel.box.position[
+                      relativesAndParents.verticalPlaneToRotateIn
+                    ] -=
+                      verticalParent.box.position[
+                        relativesAndParents.verticalPlaneToRotateIn
+                      ];
+                  
+                  } 
+                });
+                isSideChosen = true;
+              }
+              
+              verticalMove = true;
+              verticalParent.box.rotation[
+                relativesAndParents.verticalPlaneToRotateIn
+              ] = -event.offsetY / 90;
+             
+            }
+            pickedCubie.material.alpha = 1;
+          };
+
+          scene.onPointerUp = function () {
+            //pickedCubie.parent = null
+            pickedCubie.material.alpha = 0.5;
+            camera.inputs.attachInput(camera.inputs.attached.pointers);
+            scene.onPointerMove = null;
+            scene.onPointerUp = null;
+            scene.onPointerDown = null;
+
+            if(horizontalMove) {
+              isSideChosen = false;
+            horizontalRelatives.forEach((relative) => {
+          
+              relative.box.position = relative.box.getAbsolutePosition()
+              relative.box.rotation = horizontalParent.box.rotation;
+              relative.box.parent = null;
+              
+            });
+            }
+
+            if (verticalMove) {
+              isSideChosen = false;
+              verticalRelatives.forEach((relative) => {
+                relative.box.position = relative.box.getAbsolutePosition();
+                relative.box.rotation = verticalParent.box.rotation;
+                relative.box.parent = null;
+              });
+           }
+
+            horizontalMove = false;
+            verticalMove = false;
+
+            that.moveSides()
+          };
+        }
+      };
+
+    }
+
+  }
 
   const MainCubeInterface = new Interface();
   MainCubeInterface.makeCubeFromCubies();
