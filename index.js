@@ -244,6 +244,7 @@ const createScene = () => {
                     return cubie;
                 }
               );
+
             cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = "x";
           },
         };
@@ -271,6 +272,8 @@ const createScene = () => {
         let pickedPoint = pickResult.pickedPoint;
 
         if (pickResult.hit) {
+          pickedCubie.material.alpha = 1;
+
           camera.inputs.attached.pointers.detachControl();
 
           let relativesAndParents = that.findPickedCubieRelatives(
@@ -286,65 +289,39 @@ const createScene = () => {
 
           scene.onPointerMove = function (event) {
             if (
-             ( Math.abs(event.movementX) > Math.abs(event.movementY)) &&
+              Math.abs(event.movementX) > Math.abs(event.movementY) &&
               !verticalMove
             ) {
-      
-              if (!isSideChosen) {
-                horizontalRelatives.forEach((rel) => {
-                  if (
-                    JSON.stringify(rel.box.position) !==
-                    JSON.stringify(horizontalParent.box.position)
-                  ) {
-                    rel.box.parent = horizontalParent.box;
-                    rel.box.position[
-                      relativesAndParents.horizontalPlaneToRotateIn
-                    ] -=
-                      horizontalParent.box.position[
-                      relativesAndParents.horizontalPlaneToRotateIn
-                      ];
-                  }
-                });
-                isSideChosen = true;
-              }
-              horizontalMove = true;
-
-              horizontalParent.box.rotation[
-                relativesAndParents.horizontalPlaneToRotateIn
-              ] = -event.offsetX / 50;
-
+              // if (!isSideChosen) {
+              //   horizontalRelatives.forEach((rel) => {
+              //     if (
+              //       JSON.stringify(rel.box.position) !==
+              //       JSON.stringify(horizontalParent.box.position)
+              //     ) {
+              //       rel.box.parent = horizontalParent.box;
+              //       rel.box.position[
+              //         relativesAndParents.horizontalPlaneToRotateIn
+              //       ] -=
+              //         horizontalParent.box.position[
+              //         relativesAndParents.horizontalPlaneToRotateIn
+              //         ];
+              //     }
+              //   });
+              //   isSideChosen = true;
+              // }
+              // horizontalMove = true;
+              // horizontalParent.box.rotation[
+              //   relativesAndParents.horizontalPlaneToRotateIn
+              // ] = -event.offsetX / 50;
             } else if (
-              (Math.abs(event.movementX) < Math.abs(event.movementY)) &&
+              Math.abs(event.movementX) < Math.abs(event.movementY) &&
               !horizontalMove
             ) {
               if (!isSideChosen) {
-
-                verticalRelatives.forEach((rel) => {
-                  if (
-                    JSON.stringify(rel.box.position) !==
-                    JSON.stringify(verticalParent.box.position)
-                  ) {
-                   
-                    rel.box.parent = verticalParent.box;
-                    rel.box.position[
-                      relativesAndParents.verticalPlaneToRotateIn
-                    ] -=
-                      verticalParent.box.position[
-                        relativesAndParents.verticalPlaneToRotateIn
-                      ];
-                  
-                  } 
-                });
                 isSideChosen = true;
+                verticalMove = true;
               }
-              
-              verticalMove = true;
-              verticalParent.box.rotation[
-                relativesAndParents.verticalPlaneToRotateIn
-              ] = -event.offsetY / 90;
-             
             }
-            pickedCubie.material.alpha = 1;
           };
 
           scene.onPointerUp = function () {
@@ -355,36 +332,96 @@ const createScene = () => {
             scene.onPointerUp = null;
             scene.onPointerDown = null;
 
-            if(horizontalMove) {
-              isSideChosen = false;
-            horizontalRelatives.forEach((relative) => {
-          
-              relative.box.position = relative.box.getAbsolutePosition()
-              relative.box.rotation = horizontalParent.box.rotation;
-              relative.box.parent = null;
-              
-            });
-            }
+            // if(horizontalMove) {
+            //   isSideChosen = false;
+            // horizontalRelatives.forEach((relative) => {
+
+            //   relative.box.position = relative.box.getAbsolutePosition()
+            //   relative.box.rotation = horizontalParent.box.rotation;
+            //   relative.box.parent = null;
+
+            // });
+            // }
 
             if (verticalMove) {
-              isSideChosen = false;
-              verticalRelatives.forEach((relative) => {
-                relative.box.position = relative.box.getAbsolutePosition();
-                relative.box.rotation = verticalParent.box.rotation;
-                relative.box.parent = null;
+              verticalRelatives.forEach((rel) => {
+                if (
+                  JSON.stringify(rel.box.position) !==
+                  JSON.stringify(verticalParent.box.position)
+                ) {
+                  //  console.log(rel.box.position);
+                  rel.box.parent = verticalParent.box;
+                  rel.box.position[
+                    relativesAndParents.verticalPlaneToRotateIn
+                  ] -=
+                    verticalParent.box.position[
+                      relativesAndParents.verticalPlaneToRotateIn
+                    ];
+                }
               });
-           }
+
+              // scene.registerBeforeRender(function () {
+              //     verticalParent.box.rotation[
+              //       relativesAndParents.verticalPlaneToRotateIn
+              //   ] -= 0.005;
+
+              // })
+
+              const xSlide = new BABYLON.Animation(
+                "xSlide",
+                `rotation.${relativesAndParents.verticalPlaneToRotateIn}`,
+                1000 / 60,
+                BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+              );
+
+              let keyFrames = [];
+
+              keyFrames.push({
+                frame: 0,
+                value: 0,
+              });
+
+              keyFrames.push({
+                frame: 20,
+                value: -1.5708,
+              });
+
+              xSlide.setKeys(keyFrames);
+
+              verticalParent.box.animations.push(xSlide);
+              const myAnim = scene.beginAnimation(verticalParent.box, 0, 20);
+              myAnim.onAnimationEnd = function () {
+                console.log("end");
+                // scene.stopAnimation(verticalParent.box);
+                // verticalParent.box.animations = new Array();
+                verticalRelatives.forEach((relative) => {
+                  //relative.box.position = relative.box.getAbsolutePosition();
+                  console.log('before',relative.box.position);
+                  console.log('after',relative.box.getAbsolutePosition());
+                  relative.box.position.x =
+                    relative.box.getAbsolutePosition().x;
+                  relative.box.position.y =
+                    relative.box.getAbsolutePosition().y
+                  relative.box.position.z =
+                    relative.box.getAbsolutePosition().z;
+
+                  relative.box.rotation = verticalParent.box.rotation;
+
+                  relative.box.parent = null;
+                  
+                });
+              };
+            }
 
             horizontalMove = false;
             verticalMove = false;
 
-            that.moveSides()
+            that.moveSides();
           };
         }
       };
-
     }
-
   }
 
   const MainCubeInterface = new Interface();
