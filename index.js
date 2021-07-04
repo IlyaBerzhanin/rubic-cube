@@ -248,7 +248,11 @@ const createScene = () => {
       };
     }
 
-    animateRotation(parent, planeToRotateIn, callback) {
+    animateRotation(parent, planeToRotateIn, minusOrPlus, callback) {
+      let calculatedRotation =
+        minusOrPlus === "-"
+          ? parent.rotation[planeToRotateIn] - BABYLON.Tools.ToRadians(90)
+          : parent.rotation[planeToRotateIn] + BABYLON.Tools.ToRadians(90);
         const xSlide = new BABYLON.Animation(
           "xSlide",
           `rotation.${planeToRotateIn}`,
@@ -266,9 +270,7 @@ const createScene = () => {
 
         keyFrames.push({
           frame: 20,
-          value:
-            parent.rotation[planeToRotateIn] -
-            BABYLON.Tools.ToRadians(90),
+          value: calculatedRotation
         });
 
         xSlide.setKeys(keyFrames);
@@ -284,7 +286,7 @@ const createScene = () => {
       let horizontalMove = false;
       let verticalMove = false;
       let isSideChosen = false;
-      let plusOrMinusDegrees
+      let plusOrMinus
 
       let that = this;
       let horizontalRelatives;
@@ -294,11 +296,13 @@ const createScene = () => {
       let horizontalPlaneToRotateIn;
       let verticalPlaneToRotateIn;
 
-      scene.onPointerDown = function () {
+      scene.onPointerDown = function (e) {
+        let pickPositionX = e.pageX
+        let pickPositionY = e.pageY;
         let pickResult = scene.pick(scene.pointerX, scene.pointerY);
         let pickedCubie = pickResult.pickedMesh;
         let pickedPoint = pickResult.pickedPoint;
-        console.log(pickResult);
+        
 
         if (pickResult.hit) {
           pickedCubie.material.alpha = 1;
@@ -319,7 +323,7 @@ const createScene = () => {
           verticalPlaneToRotateIn = relativesAndParents.verticalPlaneToRotateIn;
 
           scene.onPointerMove = function (event) {
-            console.log(event);
+        
             if (
               Math.abs(event.movementX) > Math.abs(event.movementY) &&
               !verticalMove
@@ -327,6 +331,7 @@ const createScene = () => {
               if (!isSideChosen) {
                 isSideChosen = true;
                 horizontalMove = true;
+                plusOrMinus = event.offsetX > pickPositionX ? '-' : '+'
               }
             } else if (
               Math.abs(event.movementX) < Math.abs(event.movementY) &&
@@ -335,6 +340,7 @@ const createScene = () => {
               if (!isSideChosen) {
                 isSideChosen = true;
                 verticalMove = true;
+                plusOrMinus = event.offsetY < pickPositionY ? "-" : "+";
               }
             }
           };
@@ -349,7 +355,7 @@ const createScene = () => {
             if (horizontalMove) {
               horizontalRelatives.forEach((relative) => relative.box.setParent(horizontalParent));
 
-              that.animateRotation(horizontalParent, horizontalPlaneToRotateIn, () => {
+              that.animateRotation(horizontalParent, horizontalPlaneToRotateIn, plusOrMinus, () => {
                  horizontalRelatives.forEach((relative) => relative.box.setParent(null));
                 horizontalParent.dispose();
                 horizontalMove = false;
@@ -359,7 +365,7 @@ const createScene = () => {
             if (verticalMove) {
               verticalRelatives.forEach((relative) => relative.box.setParent(verticalParent));
 
-              that.animateRotation(verticalParent, verticalPlaneToRotateIn, () => {
+              that.animateRotation(verticalParent, verticalPlaneToRotateIn, plusOrMinus, () => {
                   verticalRelatives.forEach((relative) => relative.box.setParent(null));
                 verticalParent.dispose();
                 verticalMove = false;
