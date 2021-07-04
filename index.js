@@ -25,7 +25,6 @@ const createScene = () => {
     constructor(options) {
       const mat = new BABYLON.StandardMaterial("mat", scene);
       mat.alpha = 0.5;
-      this.selected = false;
 
       this.box = BABYLON.MeshBuilder.CreateBox(
         "box",
@@ -47,7 +46,7 @@ const createScene = () => {
   }
 
   class Interface {
-    constructor() {
+    constructor(boxClass) {
       this.mainCubeSideColors = {
         frontColor: BABYLON.Color3.Blue(),
         backColor: BABYLON.Color3.Teal(),
@@ -58,7 +57,7 @@ const createScene = () => {
       };
 
       this.helpersClasses = {
-        parentBoxClass: ParentBox,
+        parentBoxClass: boxClass,
       };
 
       this.cubies = [];
@@ -80,7 +79,6 @@ const createScene = () => {
       this.cubieSideColors[5] = BABYLON.Color3.Black();
 
       //the cube will be created with 3 parts of 9 small cubes in depth
-    
     }
 
     makeCubeFromCubies() {
@@ -152,121 +150,155 @@ const createScene = () => {
     }
 
     findPickedCubieRelatives(pickedCubieItem, maxPickedPointCoordinateName) {
-      let cubieRelativesAndParentsToRotate = {};
+      let horizontalPlaneToRotateIn;
+      let verticalPlaneToRotateIn;
+      let horizontalRelatives;
+      let verticalRelatives;
+      let horizontalParent;
+      let verticalParent;
 
       if (pickedCubieItem) {
         let actionsWithCoordinates = {
           x: () => {
             console.log("xxx");
-            cubieRelativesAndParentsToRotate.horizontalRelatives =
-              this.cubies.filter(
-                (cubie) => cubie.box.position.y === pickedCubieItem.position.y
-              );
-            cubieRelativesAndParentsToRotate.horizontalParent =
-              cubieRelativesAndParentsToRotate.horizontalRelatives.find(
-                (cubie) => {
-                  if (cubie.box.position.x === 0 && cubie.box.position.z === 0)
-                    return cubie;
-                }
-              );
-            cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = "y";
+            horizontalRelatives = this.cubies.filter(
+              (cubie) => cubie.box.position.y === pickedCubieItem.position.y
+            );
 
-            cubieRelativesAndParentsToRotate.verticalRelatives =
-              this.cubies.filter(
-                (cubie) => cubie.box.position.z === pickedCubieItem.position.z
-              );
-            cubieRelativesAndParentsToRotate.verticalParent =
-              cubieRelativesAndParentsToRotate.verticalRelatives.find(
-                (cubie) => {
-                  if (cubie.box.position.x === 0 && cubie.box.position.y === 0)
-                    return cubie;
-                }
-              );
-            cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = "z";
+            horizontalParent = new BABYLON.TransformNode("root");
+            horizontalParent.position.y = pickedCubieItem.position.y;
+            horizontalParent.position.x = 0;
+            horizontalParent.position.z = 0;
+
+            horizontalPlaneToRotateIn = "y";
+
+            verticalRelatives = this.cubies.filter(
+              (cubie) => cubie.box.position.z === pickedCubieItem.position.z
+            );
+
+            verticalParent = new BABYLON.TransformNode("root");
+            verticalParent.position.z = pickedCubieItem.position.z;
+            verticalParent.position.y = 0;
+            verticalParent.position.x = 0;
+
+            verticalPlaneToRotateIn = "z";
           },
 
           y: () => {
             console.log("yyy");
-            cubieRelativesAndParentsToRotate.horizontalRelatives =
-              this.cubies.filter(
-                (cubie) => cubie.box.position.z === pickedCubieItem.position.z
-              );
-            cubieRelativesAndParentsToRotate.horizontalParent =
-              cubieRelativesAndParentsToRotate.horizontalRelatives.find(
-                (cubie) => {
-                  if (cubie.box.position.x === 0 && cubie.box.position.y === 0)
-                    return cubie;
-                }
-              );
-            cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = "z";
+            horizontalRelatives = this.cubies.filter(
+              (cubie) => cubie.box.position.z === pickedCubieItem.position.z
+            );
 
-            cubieRelativesAndParentsToRotate.verticalRelatives =
-              this.cubies.filter(
-                (cubie) => cubie.box.position.x === pickedCubieItem.position.x
-              );
-            cubieRelativesAndParentsToRotate.verticalParent =
-              cubieRelativesAndParentsToRotate.verticalRelatives.find(
-                (cubie) => {
-                  if (cubie.box.position.z === 0 && cubie.box.position.y === 0)
-                    return cubie;
-                }
-              );
-            cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = "x";
+            horizontalParent = new BABYLON.TransformNode("root");
+            horizontalParent.position.z = pickedCubieItem.position.z;
+            horizontalParent.position.x = 0;
+            horizontalParent.position.y = 0;
+
+            horizontalPlaneToRotateIn = "z";
+
+            verticalRelatives = this.cubies.filter(
+              (cubie) => cubie.box.position.x === pickedCubieItem.position.x
+            );
+
+            verticalParent = new BABYLON.TransformNode("root");
+            verticalParent.position.x = pickedCubieItem.position.x;
+            verticalParent.position.y = 0;
+            verticalParent.position.z = 0;
+
+            verticalPlaneToRotateIn = "x";
           },
 
           z: () => {
             console.log("zzz");
-            cubieRelativesAndParentsToRotate.horizontalRelatives =
-              this.cubies.filter(
-                (cubie) => cubie.box.position.y === pickedCubieItem.position.y
-              );
-            cubieRelativesAndParentsToRotate.horizontalParent =
-              cubieRelativesAndParentsToRotate.horizontalRelatives.find(
-                (cubie) => {
-                  if (cubie.box.position.x === 0 && cubie.box.position.z === 0)
-                    return cubie;
-                }
-              );
-            cubieRelativesAndParentsToRotate.horizontalPlaneToRotateIn = "y";
+            horizontalRelatives = this.cubies.filter(
+              (cubie) => cubie.box.position.y === pickedCubieItem.position.y
+            );
 
-            cubieRelativesAndParentsToRotate.verticalRelatives =
-              this.cubies.filter(
-                (cubie) => cubie.box.position.x === pickedCubieItem.position.x
-              );
-            cubieRelativesAndParentsToRotate.verticalParent =
-              cubieRelativesAndParentsToRotate.verticalRelatives.find(
-                (cubie) => {
-                  if (cubie.box.position.z === 0 && cubie.box.position.y === 0)
-                    return cubie;
-                }
-              );
+            horizontalParent = new BABYLON.TransformNode("root");
+            horizontalParent.position.y = pickedCubieItem.position.y;
+            horizontalParent.position.x = 0;
+            horizontalParent.position.z = 0;
 
-            cubieRelativesAndParentsToRotate.verticalPlaneToRotateIn = "x";
+            horizontalPlaneToRotateIn = "y";
+
+            verticalRelatives = this.cubies.filter(
+              (cubie) => cubie.box.position.x === pickedCubieItem.position.x
+            );
+
+            verticalParent = new BABYLON.TransformNode("root");
+            verticalParent.position.x = pickedCubieItem.position.x;
+            verticalParent.position.y = 0;
+            verticalParent.position.z = 0;
+
+            verticalPlaneToRotateIn = "x";
           },
         };
 
         actionsWithCoordinates[maxPickedPointCoordinateName]();
       }
 
-      return cubieRelativesAndParentsToRotate;
+      return {
+        horizontalPlaneToRotateIn: horizontalPlaneToRotateIn,
+        verticalPlaneToRotateIn: verticalPlaneToRotateIn,
+        horizontalRelatives: horizontalRelatives,
+        verticalRelatives: verticalRelatives,
+        horizontalParent: horizontalParent,
+        verticalParent: verticalParent,
+      };
+    }
+
+    animateRotation(parent, planeToRotateIn, callback) {
+        const xSlide = new BABYLON.Animation(
+          "xSlide",
+          `rotation.${planeToRotateIn}`,
+          1000 / 60,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+          BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+        );
+
+        let keyFrames = [];
+
+        keyFrames.push({
+          frame: 0,
+          value: parent.rotation[planeToRotateIn],
+        });
+
+        keyFrames.push({
+          frame: 20,
+          value:
+            parent.rotation[planeToRotateIn] -
+            BABYLON.Tools.ToRadians(90),
+        });
+
+        xSlide.setKeys(keyFrames);
+
+        parent.animations.push(xSlide);
+        const myAnim = scene.beginAnimation(parent, 0, 20);
+        myAnim.onAnimationEnd = function () {
+          callback()
+        };
     }
 
     moveSides() {
       let horizontalMove = false;
       let verticalMove = false;
       let isSideChosen = false;
+      let plusOrMinusDegrees
 
       let that = this;
       let horizontalRelatives;
       let verticalRelatives;
       let horizontalParent;
       let verticalParent;
+      let horizontalPlaneToRotateIn;
+      let verticalPlaneToRotateIn;
 
       scene.onPointerDown = function () {
-        console.log(BABYLON.Tools.ToRadians(90));
         let pickResult = scene.pick(scene.pointerX, scene.pointerY);
         let pickedCubie = pickResult.pickedMesh;
         let pickedPoint = pickResult.pickedPoint;
+        console.log(pickResult);
 
         if (pickResult.hit) {
           pickedCubie.material.alpha = 1;
@@ -280,12 +312,14 @@ const createScene = () => {
 
           horizontalRelatives = relativesAndParents.horizontalRelatives;
           horizontalParent = relativesAndParents.horizontalParent;
+          horizontalPlaneToRotateIn = relativesAndParents.horizontalPlaneToRotateIn;
 
           verticalRelatives = relativesAndParents.verticalRelatives;
           verticalParent = relativesAndParents.verticalParent;
-
+          verticalPlaneToRotateIn = relativesAndParents.verticalPlaneToRotateIn;
 
           scene.onPointerMove = function (event) {
+            console.log(event);
             if (
               Math.abs(event.movementX) > Math.abs(event.movementY) &&
               !verticalMove
@@ -306,7 +340,6 @@ const createScene = () => {
           };
 
           scene.onPointerUp = function () {
-            //pickedCubie.parent = null
             pickedCubie.material.alpha = 0.5;
             camera.inputs.attachInput(camera.inputs.attached.pointers);
             scene.onPointerMove = null;
@@ -314,135 +347,36 @@ const createScene = () => {
             scene.onPointerDown = null;
 
             if (horizontalMove) {
+              horizontalRelatives.forEach((relative) => relative.box.setParent(horizontalParent));
 
-              horizontalRelatives.forEach((rel) => {
-                if (
-                  JSON.stringify(rel.box.position) !==
-                  JSON.stringify(horizontalParent.box.position)
-                ) {
-                  console.log(rel.box.position);
-                  // rel.box.parent = verticalParent.box;
-                  rel.box.setParent(horizontalParent.box);
-                }
-              });
-
-              const xSlide = new BABYLON.Animation(
-                "xSlide",
-                `rotation.${relativesAndParents.horizontalPlaneToRotateIn}`,
-                1000 / 60,
-                BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-              );
-
-              let keyFrames = [];
-
-              keyFrames.push({
-                frame: 0,
-                value:
-                  horizontalParent.box.rotation[
-                    relativesAndParents.horizontalPlaneToRotateIn
-                  ],
-              });
-
-              keyFrames.push({
-                frame: 20,
-                value:
-                  horizontalParent.box.rotation[
-                    relativesAndParents.horizontalPlaneToRotateIn
-                  ] - BABYLON.Tools.ToRadians(90),
-              });
-
-              xSlide.setKeys(keyFrames);
-
-              horizontalParent.box.animations.push(xSlide);
-              const myAnim = scene.beginAnimation(horizontalParent.box, 0, 20);
-              myAnim.onAnimationEnd = function () {
-                console.log("end");
-                // scene.stopAnimation(verticalParent.box);
-                // verticalParent.box.animations = new Array();
-                horizontalRelatives.forEach((relative) => {
-                  relative.box.position.x =
-                    Math.round(relative.box.position.x * 10) / 10;
-                  relative.box.position.y =
-                    Math.round(relative.box.position.y * 10) / 10;
-                  relative.box.position.z =
-                    Math.round(relative.box.position.z * 10) / 10;
-                  
-                  relative.box.position._isDirty = false;
-                  
-                  console.log('after', relative.box.position._isDirty);
-                  // relative.box.parent = null;
-                  relative.box.setParent(null);
-                });
-              };
+              that.animateRotation(horizontalParent, horizontalPlaneToRotateIn, () => {
+                 horizontalRelatives.forEach((relative) => relative.box.setParent(null));
+                horizontalParent.dispose();
+                horizontalMove = false;
+              })
             }
 
             if (verticalMove) {
-              verticalRelatives.forEach((rel) => {
-                if (
-                  JSON.stringify(rel.box.position) !==
-                  JSON.stringify(verticalParent.box.position)
-                ) {
-                  //  console.log(rel.box.position);
-                  // rel.box.parent = verticalParent.box;
-                  rel.box.setParent(verticalParent.box);
-                }
-              });
+              verticalRelatives.forEach((relative) => relative.box.setParent(verticalParent));
 
-              const xSlide = new BABYLON.Animation(
-                "xSlide",
-                `rotation.${relativesAndParents.verticalPlaneToRotateIn}`,
-                1000 / 60,
-                BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-              );
-
-              let keyFrames = [];
-
-              keyFrames.push({
-                frame: 0,
-                value:
-                  verticalParent.box.rotation[
-                    relativesAndParents.verticalPlaneToRotateIn
-                  ],
-              });
-
-              keyFrames.push({
-                frame: 20,
-                value:
-                  verticalParent.box.rotation[
-                    relativesAndParents.verticalPlaneToRotateIn
-                  ] - BABYLON.Tools.ToRadians(90),
-              });
-
-              xSlide.setKeys(keyFrames);
-
-              verticalParent.box.animations.push(xSlide);
-              const myAnim = scene.beginAnimation(verticalParent.box, 0, 20);
-              myAnim.onAnimationEnd = function () {
-                console.log("end");
-                // scene.stopAnimation(verticalParent.box);
-                // verticalParent.box.animations = new Array();
-                verticalRelatives.forEach((relative) => {
-                  //relative.box.position = relative.box.getAbsolutePosition();
-
-                  // relative.box.parent = null;
-                  relative.box.setParent(null);
-                });
-              };
+              that.animateRotation(verticalParent, verticalPlaneToRotateIn, () => {
+                  verticalRelatives.forEach((relative) => relative.box.setParent(null));
+                verticalParent.dispose();
+                verticalMove = false;
+              })
             }
 
-            horizontalMove = false;
-            verticalMove = false;
-
-            that.moveSides();
+            setTimeout(() => {
+              that.moveSides();
+              console.log("after picked ", pickedCubie.getAbsolutePosition());
+            }, 1500);
           };
         }
       };
     }
   }
 
-  const MainCubeInterface = new Interface();
+  const MainCubeInterface = new Interface(ParentBox);
   MainCubeInterface.makeCubeFromCubies();
   MainCubeInterface.moveSides();
 
